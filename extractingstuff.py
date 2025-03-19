@@ -10,7 +10,7 @@ with open("regs.txt", "r") as f:
             if (reg.split(")")[0]).endswith("+") and reg not in storedguidelines:
                 justreg = reg.split(")")
                 regnum = justreg.pop(0).rstrip()
-                g.write(regnum+ "\t"+ "".join(justreg).rstrip() + "\t Article " + reg[0] + "\n")
+                g.write(regnum+ "\t"+ "".join(justreg).rstrip() + "\t " + currentarticle + "\n")
 
 
 print("completed")
