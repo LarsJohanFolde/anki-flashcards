@@ -1,5 +1,5 @@
-currentarticle = ""
 
+#clears files to reprint all regs and guidelines
 open("regulations.csv", "w").close()
 open("guidelines.csv", "w").close()
 
