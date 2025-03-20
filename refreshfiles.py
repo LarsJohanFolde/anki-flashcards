@@ -1,8 +1,24 @@
+import requests
+import html2text
+url = "https://www.worldcubeassociation.org/regulations/full/"
 
 #clears files to reprint all regs and guidelines
 open("regulations.csv", "w").close()
 open("guidelines.csv", "w").close()
+open("test.txt", "w").close()
 
+content = requests.get(url).text
+#updates regulations in regs.txt
+print(html2text.content)
+
+with open("test.txt", "a", encoding="utf-8") as f:
+    for line in nightmarelistwithalltheregs.split("\n"):
+        if ") " in line and  not line.startswith(" "):
+            if line.split("\"")[1].endswith("+"):
+                f.write(line.split("\"")[1] + ") " + line.split(">")[5].split("<")[0] + " " + line.split(">")[7] + "\n")
+            else:
+                f.write((line.split("\"")[1] + line.split(">")[3]).split("<")[0]  + "\n")
+                #f.write(line + "\n")
 #Guidelines
 with open("regs.txt", "r") as f:
     with open("guidelines.csv", "a") as g:
