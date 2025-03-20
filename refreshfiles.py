@@ -1,47 +1,56 @@
-import requests
-import html2text
-url = "https://www.worldcubeassociation.org/regulations/full/"
+import pandas as pd
+from enum import Enum
+from dataclasses import dataclass
 
-#clears files to reprint all regs and guidelines
-open("regulations.csv", "w").close()
-open("guidelines.csv", "w").close()
-open("test.txt", "w").close()
+class RegulationType(Enum):
+    REGULATION = 1
+    GUIDELINE = 2
 
-content = requests.get(url).text
-#updates regulations in regs.txt
-print(html2text.content)
+@dataclass
+class Regulation:
+    """
+    This is a model of a WCA Regulation or Guideline. It contains the text of
+    the regulation, the regulation number, and the article it belongs to.
+    """
+    regulation_type: RegulationType
+    article: str
+    regulation_number: str
+    regulation_text: str
 
-with open("test.txt", "a", encoding="utf-8") as f:
-    for line in nightmarelistwithalltheregs.split("\n"):
-        if ") " in line and  not line.startswith(" "):
-            if line.split("\"")[1].endswith("+"):
-                f.write(line.split("\"")[1] + ") " + line.split(">")[5].split("<")[0] + " " + line.split(">")[7] + "\n")
-            else:
-                f.write((line.split("\"")[1] + line.split(">")[3]).split("<")[0]  + "\n")
-                #f.write(line + "\n")
-#Guidelines
-with open("regs.txt", "r") as f:
-    with open("guidelines.csv", "a") as g:
-        all = f.readlines()
-        for reg in all:
-            if reg.startswith("Article"):
-                currentarticle = reg.split(":")[0].replace(" ", "_")
-            if (reg.split(")")[0]).endswith("+"):
-                justreg = reg.split(")")
-                regnum = justreg.pop(0).rstrip()
-                g.write(regnum+ "\t"+ "".join(justreg).rstrip() + "\t " + currentarticle + "\n")
+def create_anki_cards(file: str) -> None:
+    """
+    Create one csv file for the regulations and one for the guidelines to import into anki.
 
-#Regs
-with open("regs.txt", "r") as f:
-    with open("regulations.csv", "a") as g:
-        all = f.readlines()
-        for reg in all:
-            if reg.startswith("Article"):
-                currentarticle = reg.split(":")[0].replace(" ", "_")
+    We are reading a file containing the text from the [WCA Regulations](https://www.worldcubeassociation.org/regulations/full/).
+    This file is expected to not contain any empty lines or things that are not regulations, guidelines or article numbers.
+    """
+    regs: list[Regulation] = []
+    with open(file, 'r') as f:
+        article: str = ""
+        for line in f.readlines():
+            line_array: list[str] = line.split(" ")
+
+            # Update article number when you encounter a new article
+            if line_array[0] == 'Article':
+                article = f'{line_array[0]} {line_array[1].replace(":", "")}'
                 continue
-            if not (reg.split(")")[0]).endswith("+"):
-                justreg = reg.split(")")
-                regnum = justreg.pop(0).rstrip()
-                g.write(regnum+ "\t"+ "".join(justreg).rstrip() + "\t " + currentarticle + "\n")
 
-print("completed")
+            regulation_type: RegulationType = RegulationType.REGULATION if "+" not in line_array[0] else RegulationType.GUIDELINE
+            regulation_number: str = line_array[0].replace(")", "")
+
+            regulation_text: str = " ".join(line_array[1:])
+            regs.append(Regulation(regulation_type, article, regulation_number, regulation_text))
+
+    regs_df = pd.DataFrame(regs)
+    regulations = regs_df[["regulation_type"] == RegulationType.REGULATION]
+    guidelines = regs_df[["regulation_type"] == RegulationType.GUIDELINE]
+    regulations.to_csv("regulations.csv", sep='\t', index=False)
+    guidelines.to_csv("guidelines.csv", sep='\t', index=False)
+
+
+def guidelines_to_csv(file: str) -> None:
+    ...
+
+
+if __name__ == '__main__':
+    create_anki_cards('regs.txt')
