@@ -48,10 +48,5 @@ def create_anki_cards(file: str) -> None:
     regulations.to_csv("regulations.csv", sep='\t', columns=["article", "regulation_number", "regulation_text"], index=False)
     guidelines.to_csv("guidelines.csv", sep='\t', columns=["article", "regulation_number", "regulation_text"], index=False)
 
-
-def guidelines_to_csv(file: str) -> None:
-    ...
-
-
 if __name__ == '__main__':
     create_anki_cards('regs.txt')
