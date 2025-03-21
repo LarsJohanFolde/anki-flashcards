@@ -28,6 +28,7 @@ def create_anki_cards(file: str) -> None:
     with open(file, 'r') as f:
         article: str = ""
         for line in f.readlines():
+            line = line.rstrip()
             line_array: list[str] = line.split(" ")
 
             # Update article number when you encounter a new article
@@ -42,10 +43,10 @@ def create_anki_cards(file: str) -> None:
             regs.append(Regulation(regulation_type, article, regulation_number, regulation_text))
 
     regs_df = pd.DataFrame(regs)
-    regulations = regs_df[["regulation_type"] == RegulationType.REGULATION]
-    guidelines = regs_df[["regulation_type"] == RegulationType.GUIDELINE]
-    regulations.to_csv("regulations.csv", sep='\t', index=False)
-    guidelines.to_csv("guidelines.csv", sep='\t', index=False)
+    regulations = regs_df[regs_df["regulation_type"] == RegulationType.REGULATION]
+    guidelines = regs_df[regs_df["regulation_type"] == RegulationType.GUIDELINE]
+    regulations.to_csv("regulations.csv", sep='\t', columns=["article", "regulation_number", "regulation_text"], index=False)
+    guidelines.to_csv("guidelines.csv", sep='\t', columns=["article", "regulation_number", "regulation_text"], index=False)
 
 
 def guidelines_to_csv(file: str) -> None:
